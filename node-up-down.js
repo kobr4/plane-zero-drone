@@ -7,7 +7,7 @@ var options = {
 
 rpio.init(options);
 
-var pin = 33;           /* Used GPIO pin */
+var pin = 35;           /* Used GPIO pin */
 var range = 1000;       /* Range of PWM */
 var max = 100;          /*   the bottom 8th of a larger scale */
 var clockdiv = 256;       /* Clock divider (PWM refresh rate), 8 == 2.4MHz */
