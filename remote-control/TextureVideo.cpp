@@ -225,13 +225,11 @@ void TextureVideo::processVideoFromUDP(TextureVideo * texture, int port) {
 		do {
 			numrecv=SDLNet_UDP_Recv(udpsock, rcvP);
 			if(numrecv) {
-				puts("Received");
 				for (int i = 0;i < rcvP->len;i++) {
 					inbuf[i+data_size] = rcvP->data[i];
 				}
-
 				data_size += rcvP->len;
-			}
+			} else SDL_Delay(10);
 
 			
 		} while (numrecv && data_size < INBUF_SIZE);

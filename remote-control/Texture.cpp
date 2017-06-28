@@ -13,7 +13,7 @@ void Texture::unbind() {
 }
 
 void Texture::update() {
-	if (this->textureName != 0) {
+	if (this->textureName != 0 || this->invalidate == true) {
 		glBindTexture(GL_TEXTURE_2D, this->textureName); 
 				
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -21,11 +21,12 @@ void Texture::update() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_REPEAT);
+		this->invalidate = false;
 	}
 }
 
 void Texture::do_register() {
-	glGenTextures(1, &this->textureName); 
+	if (this->textureName == 0) glGenTextures(1, &this->textureName); 
 	this->update();
 }
 
