@@ -197,7 +197,6 @@ void process_input(int xaxis,int yaxis) {
 	servo_wing.max = 120;
 	servo_wing.min = 60;
 	char str[255];
-	char str2[255];
 	int s1 = (yaxis + xaxis) / 2;
 	int s2 = (-yaxis + xaxis) / 2;
 	if (s1 < -32768) s1 = -32768;
@@ -225,7 +224,7 @@ void process_thrust(int waxis) {
 	sprintf(str,"m1:%d\n",servo_motor);
 	client.send(str);
 	
-	OutputConsole::log("Throttle = %d\%\n",(wjaxis - s2.min)*100/(s2.max-s2.min) );
+	OutputConsole::log("Throttle = %d%\n",(wjaxis - s2.min)*100/(s2.max-s2.min) );
 }
 
 
@@ -720,7 +719,6 @@ void Renderer::draw()
 
 	this->fbDrawing->unbind(screenWidth,screenHeight);
 
-
 	Shader * selectedShader = NULL;
 
 
@@ -752,6 +750,7 @@ void Renderer::draw()
 	}
 	shaderTexturing->unbind();
 
+	
 	if (this->isStereo) this->fbDrawing2->unbind(screenWidth,screenHeight);
 
 	if (this->isStereo) {
@@ -768,7 +767,6 @@ void Renderer::draw()
 void Renderer::loop()
 {
 	SDL_Event event;
-	T_EFFECT effect;
 	int told = SDL_GetTicks();
 
 	while (!bExit)
@@ -793,7 +791,6 @@ void Renderer::loop()
 			int p = SDL_JoystickGetAxis(g_joystick,5);
 			process_thrust(p);
 		}
-
 
 		while( SDL_PollEvent( &event ) )
 		{
@@ -832,7 +829,7 @@ void Renderer::loop()
 				}                
 			}
 		}
-		
+
 		this->draw();
 	}
 

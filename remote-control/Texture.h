@@ -13,12 +13,14 @@ public :
 		this->height = height;
 		this->pixels = pixels;
 		this->textureName = 0;
+		this->invalidate = false;
 	}
 
 	Texture(int width, int height,int textureName) {
 		this->width = width;
 		this->height = height;
 		this->textureName = textureName;
+		this->invalidate = false;
 	}
 
 	Texture(int width, int height) {
@@ -26,6 +28,7 @@ public :
 		this->height = height;
 		this->pixels = (unsigned char *)malloc(sizeof(unsigned char)*width*height*4);
 		this->textureName = 0;
+		this->invalidate = false;
 	}
 
 	void packTexture(Texture * texture,int top_x,int top_y);

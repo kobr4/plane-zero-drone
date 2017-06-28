@@ -41,5 +41,7 @@
 *.tlog
 *.log
 *.idb
+*.sln
+*.suo
 Debug/
 Release/
