@@ -224,7 +224,7 @@ void process_thrust(int waxis) {
 	sprintf(str,"m1:%d\n",servo_motor);
 	client.send(str);
 	
-	OutputConsole::log("Throttle = %d%\n",(wjaxis - s2.min)*100/(s2.max-s2.min) );
+	OutputConsole::log("waxis = %d, Throttle = %d\n",waxis, (waxis - s2.min)*100/(s2.max-s2.min) );
 }
 
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Plane zero server service
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/plane-zero-server.sh start
+ExecStop=/usr/local/bin/plane-zero-server.sh stop
+ExecReload=/usr/local/bin/plane-zero-server.sh reload
+
+[Install]
+WantedBy=multi-user.target
