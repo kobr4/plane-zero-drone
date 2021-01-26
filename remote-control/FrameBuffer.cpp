@@ -34,32 +34,35 @@ void FrameBuffer::unbind(int screenWidth, int screenHeight){
 }
 
 void FrameBuffer::do_register(){
-		glGenFramebuffers(1, &this->fb);
-		glGenRenderbuffers(1, &this->depthRb);
-		glBindRenderbuffer(GL_RENDERBUFFER, this->depthRb);
-		if (this->renderTex == 0) {
-			glGenTextures(1, &this->renderTex);
-			glBindTexture(GL_TEXTURE_2D, this->renderTex);
-			pixels = (unsigned char *)calloc(sizeof(char),4 * width * height);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-		} else {
-			glBindTexture(GL_TEXTURE_2D, this->renderTex);
-		}
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-		glBindRenderbuffer(GL_RENDERBUFFER, this->depthRb);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, this->width, this->height);	
+	glGenFramebuffers(1, &this->fb);
+	glGenRenderbuffers(1, &this->depthRb);
+	
+	glBindRenderbuffer(GL_RENDERBUFFER, this->depthRb);
+			
+	if (this->renderTex == 0) {
+		glGenTextures(1, &this->renderTex);
+		glBindTexture(GL_TEXTURE_2D, this->renderTex);
+		pixels = (unsigned char *)calloc(sizeof(char),4 * width * height);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	} else {
+		glBindTexture(GL_TEXTURE_2D, this->renderTex);
+	}
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 
-		// check status
-		int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
-		{
-			puts("FrameBuffer::do_register()");
-			exit(0);
-		}
+	glBindRenderbuffer(GL_RENDERBUFFER, this->depthRb);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, this->width, this->height);	
+
+	// check status
+	int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		puts("FrameBuffer::do_register()");
+		exit(0);
+	}
 }
 
 Texture * FrameBuffer::getTexture() {
@@ -110,7 +113,7 @@ void FrameBuffer::blur(unsigned int screenWidth,unsigned int screenHeight) {
 	
 }
 
-void FrameBuffer::writeToTGA(char * filename) {
+void FrameBuffer::writeToTGA(const char * filename) {
 	unsigned char * map = (unsigned char *)malloc(sizeof(unsigned char) * 4 * width * height);
 	glReadPixels(0,0,width,height,GL_RGBA,GL_UNSIGNED_BYTE,map);
 	TextureGenerator::writeTGA(filename, map, width, height, true);

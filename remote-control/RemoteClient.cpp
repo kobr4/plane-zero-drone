@@ -1,9 +1,10 @@
 #include "RemoteClient.h"
-#include <SDL_net.h>
+
+#include <SDL2/SDL_net.h>
 #include <string.h>
 #include "OutputConsole.h"
 
-void RemoteClient::connect(char * address, int port) {
+void RemoteClient::connect(const char * address, int port) {
 	strcpy(this->address,address);
 	this->port = port;
 	if(SDLNet_ResolveHost(&ip,address,port)==-1) {
@@ -19,7 +20,7 @@ void RemoteClient::connect(char * address, int port) {
 	}
 }
 
-void RemoteClient::send(char * message) {
+void RemoteClient::send(const char * message) {
 	if (this->isConnected) {
 		int len=strlen(message)+1; // add one for the terminating NULL
 		int result=SDLNet_TCP_Send(tcpsock,message,len);

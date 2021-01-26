@@ -47,5 +47,5 @@ public :
 	static Texture * generatePerlinNoise(unsigned int width,unsigned int height);
 	static Texture * generatePerlinNoiseGreyscale(unsigned int width,unsigned int height);
 	static Texture * generateNormalMap(unsigned int width,unsigned int height, unsigned char * pixels);
-	static void writeTGA(char * filename, unsigned char * map, int width, int height, bool invertRB);
+	static void writeTGA(const char * filename, unsigned char * map, int width, int height, bool invertRB);
 };

@@ -1,4 +1,4 @@
-#pragma once;
+#pragma once
 
 #define SHADER_TEXTURING 1
 #define SHADER_BLUR_HORIZONTAL 2

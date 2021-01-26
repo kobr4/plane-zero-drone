@@ -30,7 +30,7 @@
 #include <stdio.h>
 float * FastMath::coslookup = new float[360];
 float * FastMath::sinlookup = new float[360];
-double FastMath::M_PI_4 = 3.141592653589793238462643383/4.0;
+//double FastMath::M_PI_4 = 3.141592653589793238462643383/4.0;
 double FastMath::M_180_PI = 180.0/3.141592653589793238462643383;
 void FastMath::init()
 {

@@ -32,7 +32,7 @@ class FastMath
 private :
 	static float * coslookup;
 	static float * sinlookup;
-	static double M_PI_4;
+	static constexpr double M_PI_4_DIV = 3.141592653589793238462643383/4.0;
 public :
 	static void init();
 	static float fastCos(int deg);

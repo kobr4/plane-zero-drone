@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "OutputConsole.h"
-#include <glm\glm.hpp>
-#include <glm\gtx\intersect.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtx/intersect.hpp>
 
 Texture * g_white_texture = NULL;
 Texture * TextureGenerator::generateTileTexture(unsigned int width,unsigned int height, unsigned int hoffset,unsigned int hspacing,unsigned int vspacing,unsigned int border
@@ -98,7 +98,7 @@ Texture * TextureGenerator::generateLightmapTexture(unsigned int width,unsigned 
 	}
 	return new Texture(width,height,(unsigned char*)texture_data);
 }
-
+/*
 Texture * TextureGenerator::generateLightmapTextureWithOcclusion(unsigned int width,unsigned int height,T_TextureLightSource * source, T_TextureQuad * quad,T_QUAD * quadOccluded, unsigned int quadArraySize,unsigned int quadToIgnore) {
 	glm::vec3 x_increment;
 	glm::vec3 y_increment;
@@ -182,6 +182,7 @@ Texture * TextureGenerator::generateLightmapTextureWithOcclusion(unsigned int wi
 	OutputConsole::toast(2000,"Lightmap generation: %d%%",100*quadToIgnore/quadArraySize);
 	return new Texture(width,height,(unsigned char*)texture_data);
 }
+*/
 
 Texture * TextureGenerator::generateFloorLightmap(unsigned int width,unsigned int height,unsigned char value) {
 	unsigned char * texture_data = (unsigned char*)malloc(sizeof(unsigned char) * width * height * 4);	
@@ -272,7 +273,7 @@ typedef struct {
 	unsigned char image_spec[10];
 } t_tgaheader;
 
-void TextureGenerator::writeTGA(char * filename, unsigned char * map, int width, int height, bool invertRB) {
+void TextureGenerator::writeTGA(const char * filename, unsigned char * map, int width, int height, bool invertRB) {
 	FILE * pFile;
 	pFile = fopen (filename , "wb");
 	t_tgaheader header;

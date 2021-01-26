@@ -1,6 +1,6 @@
 #include "TextureVideo.h"
 #include <GL/glew.h>
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 
 extern "C"
 {

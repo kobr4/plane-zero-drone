@@ -3,7 +3,8 @@
 #include "BufferData.h"
 #include "Shader.h"
 #include <GL/glew.h>
-
+#include <cstring>
+#include <stdio.h>
 
 Sprite::Sprite(Texture * texture,float width,float height,int u,int v, int u2, int v2) {
 	this->texture = texture;
@@ -17,13 +18,14 @@ Sprite::Sprite(Texture * texture,float width,float height,int u,int v, int u2, i
 	this->height = height;
 
 	GLfloat vertices[] = {
-	0.,0.,0.,(float)u,(float)v2,
-	0.,height,0.,(float)u,(float)v,
-	width,height,0.,(float)u2,(float)v,
-	width,0.,0.,(float)u2,(float)v2
+	0.f,0.f,0.f,(float)u,(float)v2,
+	0.f,height,0.f,(float)u,(float)v,
+	width,height,0.f,(float)u2,(float)v,
+	width,0.f,0.f,(float)u2,(float)v2
 	};
 	
 	vb = (float *)malloc(sizeof(float)*20);
+	
 	memcpy(vb,vertices,sizeof(float)*20);
 	this->bufferData = new BufferData(vb,20*sizeof(float));
 }
@@ -44,8 +46,7 @@ void Sprite::draw() {
 	glVertexAttribPointer(Shader::texCoordHandle,2,GL_FLOAT,GL_FALSE,5*sizeof(float),(void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(Shader::texCoordHandle);
 
-	glDrawArrays (GL_TRIANGLE_FAN,0,4);
-
+	glDrawArrays(GL_TRIANGLE_FAN,0,4);
 	this->bufferData->unbind();
 
 	this->texture->unbind();

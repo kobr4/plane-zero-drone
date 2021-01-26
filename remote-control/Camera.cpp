@@ -1,5 +1,5 @@
 //camera.cpp
-#include "camera.h"
+#include "Camera.h"
 #include <stdio.h>
 using namespace std;
 
