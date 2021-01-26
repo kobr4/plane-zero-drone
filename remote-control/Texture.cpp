@@ -1,5 +1,6 @@
 #include "Texture.h"
 #include <GL/glew.h>
+#include <stdio.h>
 
 void Texture::bind() {
 	if (this->textureName == 0 || this->invalidate) {

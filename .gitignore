@@ -45,3 +45,7 @@
 *.suo
 Debug/
 Release/
+.vscode
+*.tga
+remote
+main

@@ -26,21 +26,23 @@
 */
 //#define GLEW_STATIC
 #include "Renderer.h"
-#define GLEW_STATIC
-#include <SDL.h>
-#undef main
-#include <SDL_ttf.h>
-#include <SDL_net.h>
-#include <iostream>
+//#define GLEW_STATIC
 
+
+#include <SDL2/SDL.h>
+#undef main	
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_net.h>
+
+#include <iostream>
 #include <GL/glew.h>
 #include "Shader.h"
 #include "FrameBuffer.h"
 #include <glm/glm.hpp>
-#include <glm\gtx\rotate_vector.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm\gtx\intersect.hpp>
+#include <glm/gtx/intersect.hpp>
 #include "Sprite.h"
 #include "Texture.h"
 #include "TextureVideo.h"
@@ -51,7 +53,7 @@
 #include <time.h>       /* time */
 #include "UIWidget.h"
 #include "RemoteClient.h"
-#include <windows.h>
+//#include <windows.h>
 /*
 const char * fragment_lightmap_texturing =
 #include "assets/fragment_lightmap_texturing.gl"
@@ -66,7 +68,7 @@ const char * fragment_debug =
 ;
 */
 //ugliest hack ever !
-const char test[] = {
+const unsigned char test[] = {
 #include "font.data"
 };
 
@@ -86,13 +88,6 @@ const char * fragment_vr =
 #include "assets/fragment_vr.gl"
 ;
 
-unsigned char g_texdata[]= { 255, 255, 255, 255, 255, 255, 255, 255,
-							255, 255, 255, 255, 255, 255, 255, 255};
-
-
-unsigned char  g_checker_texdata[]= { 255, 255, 255, 255, 0, 0, 0, 0,
-							0, 0, 0, 0, 255, 255, 255, 255};
-
 int thread_func(void *data);
 SDL_Surface* CreateSurface(Uint32 flags,int width,int height,const SDL_Surface* display);
 
@@ -105,7 +100,7 @@ Shader * g_shader_debug;
 float * g_vertexBuffer = NULL;
 
 
-SDL_Joystick * g_joystick = NULL; // on crée le joystick
+SDL_Joystick * g_joystick = NULL; // on crï¿½e le joystick
 bool g_collision_detection = true;
 bool g_cullface = true;
 bool g_postprocess = false;
@@ -173,8 +168,6 @@ void func_startv_cb(void * data) {
 	client.send("video:7211");
 }
 				  
-
-static const int deadzone;
 int xjaxis = 0;
 int yjaxis = 0;
 int zjaxis = 0;
@@ -343,17 +336,16 @@ void Renderer::init(unsigned int screenWidth, unsigned int screenHeight, bool fu
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
       
-    //SDL_GL_SetSwapInterval(0); 
+
     // Double Buffer
       
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 
-	displayWindow = SDL_CreateWindow("Korridor", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->screenWidth, this->screenHeight, SDL_WINDOW_OPENGL  | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
+	displayWindow = SDL_CreateWindow("Remote", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->screenWidth, this->screenHeight, SDL_WINDOW_OPENGL  | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
 
-    // Création du contexte OpenGL
-  
+    // CrÃ©ation du contexte OpenGL
     contexteOpenGL = SDL_GL_CreateContext(displayWindow);
   
     if(contexteOpenGL == 0)
@@ -370,14 +362,20 @@ void Renderer::init(unsigned int screenWidth, unsigned int screenHeight, bool fu
 	if (TTF_Init() < 0) {
 		puts("ERROR : unable to initialize font library");
 		exit(1);
-	}
+	}// Process/log the error.) 
 
-	// GLEW Initialisation
 	glewInit();
 
+	//this->font = TTF_OpenFontRW(fontdataptr, 0, 28);
+
 	SDL_RWops* fontdataptr = SDL_RWFromConstMem(test,sizeof(test));
-	this->font = TTF_OpenFontRW(fontdataptr, 1, 28);
-	//this->font = TTF_OpenFont( "digital display tfb.ttf",28);
+	if (fontdataptr == NULL)
+	{
+		puts("ERROR : unable to load font");
+		exit(1);
+	}
+
+	this->font = TTF_OpenFontRW(fontdataptr, 0, 28);
 	if (this->font == NULL)
 	{
 		puts("ERROR : unable to load font");
@@ -397,32 +395,21 @@ void Renderer::init(unsigned int screenWidth, unsigned int screenHeight, bool fu
     unsigned int amask = 0xff000000;
 #endif
 	this->textSurface = SDL_CreateRGBSurface( 0, this->screenWidth, this->screenHeight, 32, rmask, gmask, bmask, amask);
+	SDL_FillRect(this->textSurface, NULL, 0xFFFFFFFF);
 	bExit = false;
 
-	shaderLightmapTexturing = new Shader();
-	shaderLightmapTexturing->load_fragment_from_string(fragment_lightmap_texturing);
-	shaderLightmapTexturing->load_vertex_from_string(vertex);
-	//shaderLightmapTexturing->load_fragment("fragment_lightmap_texturing.gl");
-	//shaderLightmapTexturing->load_vertex("vertex.gl");
-
-	shaderTexturing = Shader::createBuiltin(SHADER_TEXTURING);
+	this->shaderTexturing = Shader::createBuiltin(SHADER_TEXTURING);
 
 	Texture * textSurfaceTexture = new Texture(this->screenWidth,this->screenHeight,(unsigned char*)this->textSurface->pixels);
 	this->spriteTextSurface = new Sprite(textSurfaceTexture,(float)this->screenWidth,(float)this->screenHeight,0,1,1,0);
+
+
+	this->spriteDummy = new Sprite(new Texture(this->screenWidth,this->screenHeight),(float)this->screenWidth,(float)this->screenHeight,0,1,1,0);
 	this->fbDrawing = NULL;
-	this->fbDrawing2 = NULL;
-	this->fbHalfRes = NULL;
 
 	g_shader_debug = new Shader();
 	g_shader_debug->load_fragment_from_string(fragment_debug);
 	g_shader_debug->load_vertex_from_string(vertex);
-	
-	//g_shader_debug->load_fragment("fragment_debug.gl");
-	//g_shader_debug->load_vertex("vertex.gl");
-
-	shaderVr = new Shader();
-	shaderVr->load_fragment_from_string(fragment_vr);
-	shaderVr->load_vertex_from_string(vertex);
 
 	camera = new Camera();
 	camera->SetClipping(0.1f,200.f);
@@ -539,6 +526,9 @@ void Renderer::drawMessage(const char * message,float x,float y) {
 	if (strlen(message) == 0)
 		return;
 
+	if (this->font == NULL)
+		return;
+
 	SDL_Color fontcolor = {255, 255, 255};
 
 	SDL_Surface * textSur = TTF_RenderText_Solid(this->font,message,fontcolor);	//set the text surface
@@ -563,13 +553,16 @@ void Renderer::drawMessage(SDL_Surface * textSur,float x,float y) {
 
 void Renderer::drawMessage(const char * message,RendererTextAlign hAlign,RendererTextAlign vAlign)
 {
-	
 	SDL_Color fontcolor = {255, 255, 255};
 
 
 	if (strlen(message) == 0)
 		return;
 
+	if (this->font == NULL)
+		return;
+	
+	
 	SDL_Surface * textSur = TTF_RenderText_Solid(this->font,message,fontcolor);	//set the text surface
 	
 	if (textSur == NULL)
@@ -610,8 +603,7 @@ void Renderer::drawMessage(const char * message,RendererTextAlign hAlign,Rendere
 	
 	drawMessage(textSur,rect.x,rect.y);
 	
-	SDL_FreeSurface(textSur);	
-	
+	SDL_FreeSurface(textSur);
 }
 
 void swapFBdrawing(FrameBuffer **fb1, FrameBuffer **fb2) {
@@ -620,29 +612,50 @@ void swapFBdrawing(FrameBuffer **fb1, FrameBuffer **fb2) {
 	*fb1 = *fb2;
 	*fb2 = fbtmp; 
 }
+/*
+void Renderer::draw()
+{
+	
+	//OpenGL setup
+	glDisable(GL_CULL_FACE);
+	glClearColor(0, 0, 0.1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+	
+	glViewport((GLint) (0),
+				(GLint) (0),
+				(GLsizei) this->screenWidth,
+				(GLsizei) this->screenHeight);
+
+	//glMatrixMode(GL_MODELVIEW);
+
+	glDisable(GL_DEPTH_TEST);
+
+	shaderTexturing->bind();
+	shaderTexturing->setProjectionMatrixToOrtho(this->screenWidth,this->screenHeight);
+	shaderTexturing->setModelViewMatrixToIdentity();
+	shaderTexturing->bind_attributes();
+
+	this->spriteDummy->draw();
+
+	shaderTexturing->unbind();
+
+	SDL_GL_SwapWindow(displayWindow);
+}
+*/
+
 
 void Renderer::draw()
 {
 	SDL_FillRect(this->textSurface, NULL, 0x000000);
-
-	if (this->fbHalfRes == NULL){ 
-		this->fbHalfRes = new FrameBuffer(this->screenWidth / 8,this->screenHeight / 8);
-		this->fbHalfRes->do_register();
-	}
+	//SDL_FillRect(this->textSurface, NULL, 0x0FFFFFFFF);
 
 	if (this->fbDrawing == NULL){
 		this->fbDrawing = new FrameBuffer(this->screenWidth,this->screenHeight);
 		this->fbDrawing->do_register();
 	}
 
-
-	if (this->fbDrawing2 == NULL){
-		this->fbDrawing2 = new FrameBuffer(this->screenWidth,this->screenHeight);
-		this->fbDrawing2->do_register();
-	}
-	
 	this->fbDrawing->bind();
-	
+
 	//OpenGL setup
 	if (g_cullface) {
 		glEnable(GL_CULL_FACE);
@@ -651,9 +664,6 @@ void Renderer::draw()
 	}
 	glClearColor(0, 0, 0.1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-
-
-
 	
 	glViewport((GLint) (0),
 				(GLint) (0),
@@ -678,8 +688,6 @@ void Renderer::draw()
 	camera->Update();
 	camera->GetMatricies(P,V,M);
 
-	memcpy(g_shader_debug->getProjectionMatrix(),glm::value_ptr(P),sizeof(float)*16);
-	memcpy(g_shader_debug->getModelViewMatrix(),glm::value_ptr(V),sizeof(float)*16);
 	
 	
 	glEnable(GL_BLEND);
@@ -689,10 +697,6 @@ void Renderer::draw()
 	this->shaderTexturing->setProjectionMatrixToOrtho(this->screenWidth,this->screenHeight);
 	this->shaderTexturing->setModelViewMatrixToIdentity();
 	this->shaderTexturing->bind();
-	
-	if (g_postprocess && g_asyncload) {
-		this->fbHalfRes->draw(screenWidth,screenHeight);	
-	}
 	
 	if (spriteVideo != NULL) spriteVideo->draw();
 
@@ -705,8 +709,7 @@ void Renderer::draw()
 	if (UIWidget::currentWidget->isActive()){
 		UIWidget::currentWidget->drawChilds(this);
 	}
-	
-	
+
 	this->drawFps();
 
 	OutputConsole::render();
@@ -719,50 +722,19 @@ void Renderer::draw()
 
 	this->fbDrawing->unbind(screenWidth,screenHeight);
 
-	Shader * selectedShader = NULL;
-
-
-	if (this->isStereo) this->fbDrawing2->bind();
-
 	shaderTexturing->bind();
 	shaderTexturing->setProjectionMatrixToOrtho(this->screenWidth,this->screenHeight);
 	shaderTexturing->setModelViewMatrixToIdentity();
 	shaderTexturing->bind_attributes();
-	
-	if (this->isStereo) {
-		glViewport((GLint) (0),
-			(GLint) (0),
-			(GLsizei) this->screenWidth/2,
-			(GLsizei) this->screenHeight);
 
 
-		this->fbDrawing->draw(screenWidth,screenHeight);
+	this->fbDrawing->draw(screenWidth,screenHeight);			
 
-		glViewport((GLint) (this->screenWidth/2),
-		(GLint) (0),
-		(GLsizei) this->screenWidth/2,
-		(GLsizei) this->screenHeight);
-
-
-		this->fbDrawing->draw(screenWidth,screenHeight);
-	} else {
-		this->fbDrawing->draw(screenWidth,screenHeight);
-	}
 	shaderTexturing->unbind();
 
-	
-	if (this->isStereo) this->fbDrawing2->unbind(screenWidth,screenHeight);
-
-	if (this->isStereo) {
-		shaderVr->bind();
-		shaderVr->setProjectionMatrixToOrtho(this->screenWidth,this->screenHeight);
-		shaderVr->setModelViewMatrixToIdentity();
-		shaderVr->bind_attributes();
-		this->fbDrawing2->draw(screenWidth,screenHeight);
-		shaderVr->unbind();
-	}
 	SDL_GL_SwapWindow(displayWindow);
 }
+
 
 void Renderer::loop()
 {
@@ -814,13 +786,13 @@ void Renderer::loop()
 								SDL_SetRelativeMouseMode(SDL_FALSE);
 								UIWidget::currentWidget->setActive(true);
 								break;
+							case SDLK_q:
+								bExit = true;
+								break;
 							case SDLK_p:
 								this->fbDrawing->bind();
 								this->fbDrawing->writeToTGA("fbDrawing.tga");
 								this->fbDrawing->unbind(screenWidth,screenHeight);
-								this->fbHalfRes->bind();
-								this->fbHalfRes->writeToTGA("fbHalfRes.tga");
-								this->fbHalfRes->unbind(screenWidth,screenHeight);
 								break;
 							default:
 								break;

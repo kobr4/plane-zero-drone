@@ -1,5 +1,6 @@
 #include "BufferData.h"
 #include <GL/glew.h>
+#include <stdio.h>
 
 BufferData::BufferData(void * bufferData,int bufferSize) {
 	this->bufferData = bufferData;

@@ -24,9 +24,11 @@
 * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "SDL.h"
+
+#include <SDL2/SDL.h>
 //#undef main
-#include <SDL_ttf.h>
+#include <SDL2/SDL_ttf.h>
+
 class Game;
 class Sprite;
 class FrameBuffer;
@@ -72,7 +74,7 @@ public :
 	void setExitState();
 
 	~Renderer();
-	bool isStereo;
+	bool isStereo = false;
 private :
 	SDL_Thread * asyncInitThread;
 
@@ -82,17 +84,11 @@ private :
 	unsigned int frameCounter;
 	//UIWidget * headWidget;
 	FrameBuffer * fbDrawing;
-	FrameBuffer * fbDrawing2;
-	FrameBuffer * fbHalfRes;
 
 	Shader * shaderTexturing;
-	Shader * shaderLightmapTexturing;
-	Shader * shaderVr;
 
 	Sprite * spriteDummy;
-
 	Sprite * spriteTextSurface;
-	Sprite * spriteRectangle;
 	Sprite * spriteVideo;
 	SDL_Window* displayWindow;
 	SDL_GLContext contexteOpenGL;

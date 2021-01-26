@@ -4,6 +4,7 @@
 #include <string.h>
 #include "OutputConsole.h"
 #include <GL/glew.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -224,8 +225,8 @@ void Shader::bind_attributes() {
 	glUniformMatrix4fv(this->modelViewMatrixHandle, 1, 0,this->modelViewMatrix);
 	glUniformMatrix4fv(this->projectionMatrixHandle, 1, 0,this->projectionMatrix);
 	glUniform4fv(this->colorVectorHandle,1,this->colorVector);
-	//glUniform1i(this->texture0Handle,0);
-	glUniform1i(this->texture1Handle,1);
+	if (this->texture0Handle >= 0) glUniform1i(this->texture0Handle,0);
+	if (this->texture1Handle >= 0) glUniform1i(this->texture1Handle,1);
 }
 
 void Shader::bind()
@@ -252,8 +253,9 @@ void Shader::do_register() {
 	char buffer[2048];
 	int length;
 	
-	glewExperimental=GL_TRUE;
-	glewInit();
+	//glewExperimental=GL_TRUE;
+	//glewInit();
+	glActiveTexture(GL_TEXTURE0);
 
 	this->vertexShaderHandle = glCreateShader(GL_VERTEX_SHADER);
 
@@ -272,9 +274,9 @@ void Shader::do_register() {
 	glShaderSource(this->fragmentShaderHandle, this->f_length,(const GLchar **)this->f_string,this->f_string_length);
 	glCompileShader(this->fragmentShaderHandle);
 
-	glGetShaderiv(this->vertexShaderHandle,GL_COMPILE_STATUS,&status);
+	glGetShaderiv(this->fragmentShaderHandle,GL_COMPILE_STATUS,&status);
 	if (status == GL_FALSE) {
-		glGetShaderInfoLog(this->vertexShaderHandle,2048,&length,buffer);
+		glGetShaderInfoLog(this->fragmentShaderHandle,2048,&length,buffer);
 		puts("Fatal error on fragment shader compilation.");
 		puts(buffer);
 		exit(0);
@@ -295,6 +297,7 @@ void Shader::do_register() {
 	
 	this->texture0Handle = glGetUniformLocation(this->programHandle, "my_color_texture");
 	this->texture1Handle = glGetUniformLocation(this->programHandle, "my_lightmap_texture");
+
 }
 
 void Shader::setProjectionMatrixToOrtho(unsigned int width, unsigned int height) {
@@ -303,5 +306,5 @@ void Shader::setProjectionMatrixToOrtho(unsigned int width, unsigned int height)
 }
 
 void Shader::setModelViewMatrixToIdentity() {
-	memcpy(this->getModelViewMatrix(),glm::value_ptr(glm::mat4()),sizeof(float)*16);
+	memcpy(this->getModelViewMatrix(),glm::value_ptr(glm::mat4(1.0f)),sizeof(float)*16);
 }
